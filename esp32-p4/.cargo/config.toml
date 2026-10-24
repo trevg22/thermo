@@ -1,0 +1,17 @@
+[build]
+target = "riscv32imafc-unknown-none-elf"
+
+[target.riscv32imafc-unknown-none-elf]
+runner = "espflash flash --monitor"
+rustflags = [
+  "-C", "link-arg=-Tlinkall.x",
+  "-C", "force-frame-pointers",
+]
+
+[unstable]
+build-std = ["core", "alloc"]
+
+[env]
+ESP_LOG = "info"
+ESP_HAL_CONFIG_MIN_CHIP_REVISION = "100"
+ESP_SYNC_CONFIG_MIN_CHIP_REVISION = "100"

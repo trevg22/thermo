@@ -1,0 +1,39 @@
+# Rust / Cargo
+/target/
+**/target/
+Cargo.lock
+
+# ESP / embedded build artifacts
+.embuild/
+build/
+sdkconfig
+sdkconfig.old
+*.bin
+*.elf
+*.map
+
+# Flashing / debug artifacts
+*.core
+core
+*.log
+coredump*
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS / temp
+Thumbs.db
+
+# Tooling caches
+.jj/
+.mise/
+.cargo/
+
+# Vendor / third-party scratch (if any)
+tmp/
+temp/

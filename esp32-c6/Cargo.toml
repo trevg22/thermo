@@ -1,0 +1,11 @@
+[package]
+name = "thermo-esp32-c6"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+thermo = { path = ".." }
+
+esp-backtrace = { version = "0.20", features = ["esp32c6", "panic-handler", "println"] }
+esp-hal = { version = "1.2", features = ["esp32c6", "unstable"] }
+esp-println = { version = "0.18", features = ["esp32c6"] }

@@ -1,0 +1,13 @@
+[build]
+target = "xtensa-esp32s3-none-elf"
+
+[target.xtensa-esp32s3-none-elf]
+runner = "espflash flash --force --monitor"
+rustflags = ["-Cforce-frame-pointers"]
+
+[unstable]
+build-std = ["alloc", "core"]
+
+[env]
+ESP_LOG = "info"
+# This board has a pre-v3 (v1.3) ESP32-P4. esp-hal defaults to requiring v3.0.

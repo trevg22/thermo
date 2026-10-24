@@ -1,0 +1,251 @@
+import { Button, Slider } from "std-widgets.slint";
+
+export component MainWindow inherits Window {
+    title: "Thermostat";
+    width: 560px;
+    height: 340px;
+    background: #141a20;
+    default-font-size: 14px;
+
+    // State echoed from the controller (via Status frames).
+    in property <string> link-state: "offline";
+    in property <string> mode: "off";
+    in property <string> op-state: "idle";
+    in property <bool> fan-on: false;
+    in property <float> ambient: 20.0;
+    in property <string> uptime-text: "UP 0s";
+
+    // Setpoint, two-way bound to the slider so both the UI and the Rust side
+    // can drive it.
+    in-out property <float> set-temp: 70.0;
+
+    callback mode-selected(string);
+    callback temp-changed(float);
+
+    VerticalLayout {
+        padding: 20px;
+        spacing: 18px;
+
+        // Header: title + link status
+        HorizontalLayout {
+            spacing: 10px;
+
+            Text {
+                text: "THERMOSTAT";
+                font-size: 20px;
+                color: #d7e3ec;
+                vertical-alignment: center;
+            }
+            Rectangle { horizontal-stretch: 1; }
+
+            Rectangle {
+                width: 10px;
+                height: 10px;
+                border-radius: 5px;
+                background: root.link-state == "online"
+                    ? #4caf50
+                    : (root.link-state == "searching" ? #f9a825 : #c62828);
+            }
+            Text {
+                font-size: 12px;
+                color: root.link-state == "online" ? #4caf50 : #c62828;
+                text: root.link-state == "online" ? "LINKED" : (root.link-state == "searching" ? "SEARCHING" : "OFFLINE");
+            }
+        }
+
+        // Body: setpoint control + mode/status
+        HorizontalLayout {
+            spacing: 24px;
+
+            // Left: target temperature
+            VerticalLayout {
+                horizontal-stretch: 3;
+                spacing: 10px;
+
+                Text {
+                    text: "TARGET";
+                    font-size: 12px;
+                    color: #7b90a0;
+                }
+                Slider {
+                    minimum: 41;
+                    maximum: 95;
+                    value <=> root.set-temp;
+                    changed(value) => {
+                        root.temp-changed(value);
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 12px;
+
+                    Button {
+                        text: "-";
+                        width: 44px;
+                        clicked => {
+                            root.set-temp = max(41, root.set-temp - 1.0);
+                            root.temp-changed(root.set-temp);
+                        }
+                    }
+                    Text {
+                        horizontal-stretch: 1;
+                        horizontal-alignment: center;
+                        font-size: 40px;
+                        color: #eef5f9;
+                        text: "\{round(root.set-temp)}°F";
+                    }
+                    Button {
+                        text: "+";
+                        width: 44px;
+                        clicked => {
+                            root.set-temp = min(95, root.set-temp + 1.0);
+                            root.temp-changed(root.set-temp);
+                        }
+                    }
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    Text {
+                        text: "ROOM";
+                        font-size: 12px;
+                        color: #7b90a0;
+                        vertical-alignment: center;
+                    }
+                    Text {
+                        font-size: 24px;
+                        color: #26a69a;
+                        vertical-alignment: center;
+                        text: "\{round(root.ambient)}°F";
+                    }
+                    Rectangle { horizontal-stretch: 1; }
+                    Text {
+                        font-size: 12px;
+                        color: #7b90a0;
+                        vertical-alignment: center;
+                        text: root.uptime-text;
+                    }
+                }
+            }
+
+            // Right: mode + fan + operation
+            VerticalLayout {
+                horizontal-stretch: 2;
+                spacing: 12px;
+
+                Text {
+                    text: "MODE";
+                    font-size: 12px;
+                    color: #7b90a0;
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    Rectangle {
+                        width: 72px;
+                        height: 36px;
+                        border-radius: 6px;
+                        background: root.mode == "auto" ? #2e7d32 : #1d2731;
+                        TouchArea {
+                            mouse-cursor: pointer;
+                            clicked => { root.mode-selected("auto"); }
+                        }
+                        Text {
+                            text: "AUTO";
+                            color: root.mode == "auto" ? #ffffff : #9fb2c3;
+                            font-size: 13px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                    Rectangle {
+                        width: 72px;
+                        height: 36px;
+                        border-radius: 6px;
+                        background: root.mode == "heat" ? #c62828 : #1d2731;
+                        TouchArea {
+                            mouse-cursor: pointer;
+                            clicked => { root.mode-selected("heat"); }
+                        }
+                        Text {
+                            text: "HEAT";
+                            color: root.mode == "heat" ? #ffffff : #9fb2c3;
+                            font-size: 13px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                    Rectangle {
+                        width: 72px;
+                        height: 36px;
+                        border-radius: 6px;
+                        background: root.mode == "cool" ? #1565c0 : #1d2731;
+                        TouchArea {
+                            mouse-cursor: pointer;
+                            clicked => { root.mode-selected("cool"); }
+                        }
+                        Text {
+                            text: "COOL";
+                            color: root.mode == "cool" ? #ffffff : #9fb2c3;
+                            font-size: 13px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                    Rectangle {
+                        width: 72px;
+                        height: 36px;
+                        border-radius: 6px;
+                        background: root.mode == "off" ? #37474f : #1d2731;
+                        TouchArea {
+                            mouse-cursor: pointer;
+                            clicked => { root.mode-selected("off"); }
+                        }
+                        Text {
+                            text: "OFF";
+                            color: root.mode == "off" ? #ffffff : #9fb2c3;
+                            font-size: 13px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+
+                Text {
+                    text: "OPERATION";
+                    font-size: 12px;
+                    color: #7b90a0;
+                }
+                HorizontalLayout {
+                    spacing: 12px;
+
+                    Rectangle {
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 5px;
+                        background: root.op-state == "idle" ? #546e7a : (root.op-state == "heat" ? #ff7043 : #4fc3f7);
+                    }
+                    Text {
+                        font-size: 20px;
+                        color: #d7e3ec;
+                        vertical-alignment: center;
+                        text: root.op-state == "idle" ? "IDLE" : (root.op-state == "heat" ? "HEAT" : "COOL");
+                    }
+                    Rectangle { horizontal-stretch: 1; }
+                    Rectangle {
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 5px;
+                        background: root.fan-on ? #4caf50 : #37474f;
+                    }
+                    Text {
+                        font-size: 16px;
+                        color: #9fb2c3;
+                        vertical-alignment: center;
+                        text: root.fan-on ? "FAN ON" : "FAN IDLE";
+                    }
+                }
+            }
+        }
+    }
+}

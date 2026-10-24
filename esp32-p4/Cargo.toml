@@ -1,0 +1,18 @@
+[package]
+name = "thermo-esp32-p4"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+thermo = { path = ".." }
+
+esp-backtrace = { version = "0.20.0", features = ["esp32p4", "panic-handler", "println"] }
+esp-bootloader-esp-idf = { version = "0.6.0", features = ["esp32p4"] }
+esp-hal = { path = "vendor/esp-hal/esp-hal", features = ["esp32p4", "unstable"] }
+esp-println = { version = "0.18.0", default-features = false, features = ["esp32p4", "uart"] }
+
+[profile.release]
+debug = true
+debug-assertions = true
+lto = "fat"
+codegen-units = 1
